@@ -4,7 +4,7 @@ import datetime
 import math
 # Load a model imported from Tensorflow
 tensorflowNet = cv2.dnn.readNetFromTensorflow('frozen_inference_graph.pb', 'pbpb.pbtxt')
-video_capture = cv2.VideoCapture("s.mp4")
+video_capture = cv2.VideoCapture("s2.mp4") # CHANGE S.MP4 TO 0 TO DO IT ON LIVE WEBCAM
 i=0
 zeros=set()
 ones=set()
@@ -37,10 +37,10 @@ while(video_capture.isOpened()):
 
     # Runs a forward pass to compute the net output
     networkOutput = tensorflowNet.forward()
-
+    count=0
     # Loop on the outputs
     for detection in networkOutput[0,0]:
-
+        
         score = float(detection[2])
         if score > 0.4:
             #print(detection)
@@ -50,13 +50,17 @@ while(video_capture.isOpened()):
             right = detection[5] * cols
             bottom = detection[6] * rows
             cv2.putText(img, classes_90[int(detection[1])], (int(left), int(top)-15),0, 0.8, (0, 0, 255), 2, cv2.LINE_AA)
+
+            if classes_90[int(detection[1])]=='car':
+                count+=1
             #draw a red rectangle around detected objects
             cv2.rectangle(img, (int(left), int(top)), (int(right), int(bottom)), (0, 0, 255), thickness=2)
 
     # Show the image with a rectagle surrounding the detected objects 
-    #cv2.imshow('Image', img)
+    cv2.imshow('Image', img)
     b=datetime.datetime.now()
     dur=b-a
+    print('no of cars',count)
     print(round(1/dur.total_seconds()))
     if cv2.waitKey(1) & 0xFF == ord('q'):
       break
